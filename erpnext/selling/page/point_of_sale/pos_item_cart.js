@@ -660,7 +660,10 @@ erpnext.PointOfSale.ItemCart = class {
 					}
 				}
 				item_data.description = frappe.ellipsis(item_data.description, 45);
-				return `<div class="item-desc">${item_data.description}</div>`;
+				console.log('HDLOG: item_data',item_data);
+				const toTextMeter =  (input) => (input)/10
+				if(item_data.item_group == "AZ") item_data.description = toTextMeter(item_data.custom_straight)+ "+" + toTextMeter( item_data.custom_curve)+ "+" + toTextMeter(item_data.custom_end) + " x " + item_data.custom_count;
+				return `<div class="item-desc">${item_data.description} </div>`;
 			}
 			return ``;
 		}

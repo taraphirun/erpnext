@@ -163,8 +163,7 @@ erpnext.PointOfSale.ItemDetails = class {
 
 	render_form(item) {
 		const fields_to_display = this.get_form_fields(item);
-		this.$form_container.html("");
-
+		this.$form_container.html("");	
 		fields_to_display.forEach((fieldname, idx) => {
 			this.$form_container.append(
 				`<div class="${fieldname}-control" data-fieldname="${fieldname}"></div>`
@@ -179,8 +178,18 @@ erpnext.PointOfSale.ItemDetails = class {
 					...field_meta,
 					onchange: function () {
 						me.events.form_updated(me.current_item, fieldname, this.value);
+						console.log('HDLOG: onchange',fieldname,this.value,item);
+	
+						let straigth = item.custom_straight ? item.custom_straight : 0;
+						let curve = item.custom_curve ? item.custom_curve : 0;
+						let end = item.custom_end ? item.custom_end : 0;
+						let count = item.custom_count ? item.custom_count : 0;
+						let totalLength = (straigth+curve+end)/1000 * count;
+						console.log("HDLOG: custom",straigth,curve,end,count)
+						console.log("HDLOG: custom TOTAL LENGTH", totalLength)
+						if(totalLength>0) me.events.form_updated(me.current_item, 'qty',totalLength);
 					},
-				},
+					},
 				parent: this.$form_container.find(`.${fieldname}-control`),
 				render_input: true,
 			});
@@ -202,12 +211,25 @@ erpnext.PointOfSale.ItemDetails = class {
 			"warehouse",
 			"actual_qty",
 			"price_list_rate",
+			
 		];
+		const AZ_CUSTOM_FIELDS = 
+		[
+			"custom_straight",
+			"custom_curve",
+			"custom_end",
+			"custom_count"
+		];
+		
 		if (item.has_serial_no) fields.push("serial_no");
 		if (item.has_batch_no) fields.push("batch_no");
+		if (item.item_group == "AZ") fields.unshift(...AZ_CUSTOM_FIELDS);
 		return fields;
 	}
-
+	//TP: custom az function
+	// bind_custom_az_change_event(item){
+		
+	// }
 	make_auto_serial_selection_btn(item) {
 		if (item.has_serial_no || item.has_batch_no) {
 			const label = item.has_serial_no ? __("Select Serial No") : __("Select Batch No");

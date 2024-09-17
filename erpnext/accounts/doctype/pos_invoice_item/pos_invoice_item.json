@@ -103,7 +103,13 @@
   "dimension_col_break",
   "project",
   "section_break_54",
-  "page_break"
+  "column_break_axkg",
+  "page_break",
+  "straight",
+  "curve",
+  "end",
+  "count",
+  "az_dimension"
  ],
  "fields": [
   {
@@ -847,11 +853,43 @@
   {
    "fieldname": "column_break_ciit",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_axkg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "straight",
+   "fieldtype": "Int",
+   "label": "Straight",
+   "reqd": 1
+  },
+  {
+   "fieldname": "curve",
+   "fieldtype": "Int",
+   "label": "Curve"
+  },
+  {
+   "fieldname": "end",
+   "fieldtype": "Int",
+   "label": "End"
+  },
+  {
+   "fieldname": "count",
+   "fieldtype": "Int",
+   "label": "Count",
+   "reqd": 1
+  },
+  {
+   "fieldname": "az_dimension",
+   "fieldtype": "Table",
+   "label": "AZ Dimension",
+   "options": "POS Invoice AZ Item"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2024-05-07 15:56:53.343317",
+ "modified": "2024-09-17 09:12:54.546307",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "POS Invoice Item",

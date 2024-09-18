@@ -13,6 +13,7 @@ class POSInvoiceItem(SalesInvoiceItem):
 	from typing import TYPE_CHECKING
 
 	if TYPE_CHECKING:
+		from frappe.model.document import Document
 		from frappe.types import DF
 
 		actual_batch_qty: DF.Float
@@ -20,6 +21,7 @@ class POSInvoiceItem(SalesInvoiceItem):
 		allow_zero_valuation_rate: DF.Check
 		amount: DF.Currency
 		asset: DF.Link | None
+		az_dimension: DF.Table[Document]
 		barcode: DF.Data | None
 		base_amount: DF.Currency
 		base_net_amount: DF.Currency
@@ -31,6 +33,8 @@ class POSInvoiceItem(SalesInvoiceItem):
 		brand: DF.Data | None
 		conversion_factor: DF.Float
 		cost_center: DF.Link
+		count: DF.Int
+		curve: DF.Int
 		customer_item_code: DF.Data | None
 		deferred_revenue_account: DF.Link | None
 		delivered_by_supplier: DF.Check
@@ -42,6 +46,7 @@ class POSInvoiceItem(SalesInvoiceItem):
 		distributed_discount_amount: DF.Currency
 		dn_detail: DF.Data | None
 		enable_deferred_revenue: DF.Check
+		end: DF.Int
 		expense_account: DF.Link | None
 		finance_book: DF.Link | None
 		grant_commission: DF.Check
@@ -80,6 +85,7 @@ class POSInvoiceItem(SalesInvoiceItem):
 		so_detail: DF.Data | None
 		stock_qty: DF.Float
 		stock_uom: DF.Link | None
+		straight: DF.Int
 		target_warehouse: DF.Link | None
 		total_weight: DF.Float
 		uom: DF.Link

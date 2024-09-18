@@ -650,7 +650,36 @@ erpnext.PointOfSale.ItemCart = class {
 					}
 				}
 				item_data.description = frappe.ellipsis(item_data.description, 45);
-				return `<div class="item-desc">${item_data.description}</div>`;
+				const toTextMeter =  (input) => (input)/10
+				if(item_data.item_group == "AZ"){
+					item_data.description = `សង្ក័សី`;
+					let {az_dimension}  = item_data
+					if(az_dimension.length>0){
+						item_data.description = '';
+						az_dimension.forEach(row=>{
+							if(row.az_end && row.az_end > 0 ) {
+								item_data.description += `<div class="item-desc">${"កោង "+toTextMeter(row.az_straight)+ "+" + toTextMeter( row.az_curve)+ "+" + toTextMeter(row.az_end) + " x " + row.az_count +" សន្លឹក"} </div>`;
+							}
+						else if(row.az_straight && row.az_count) {
+							item_data.description += `<div class="item-desc">${"ត្រង់ "+ toTextMeter(row.az_straight)+ " x " + row.az_count +" សន្លឹក"} </div>`;
+						}
+						});
+					}
+					
+
+					// if(item_data.custom_end && item_data.custom_end > 0 ) {
+					// 		item_data.description = "កោង "+toTextMeter(item_data.custom_straight)+ "+" + toTextMeter( item_data.custom_curve)+ "+" + toTextMeter(item_data.custom_end) + " x " + item_data.custom_count +" សន្លឹក";
+					// 	}
+					// else if(item_data.custom_straight && item_data.custom_count) {
+					// 	item_data.description = "ត្រង់ "+ toTextMeter(item_data.custom_straight)+ " x " + item_data.custom_count +" សន្លឹក";
+					// }else{
+					// 	item_data.description = "សង្ក័សី"
+					// }
+
+				}
+				return item_data.description;
+				//  `<div class="item-desc">${item_data.description} </div>`;
+				
 			}
 			return ``;
 		}

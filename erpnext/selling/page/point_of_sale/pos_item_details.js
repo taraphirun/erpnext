@@ -42,7 +42,9 @@ erpnext.PointOfSale.ItemDetails = class {
 				<div class="item-image"></div>
 			</div>
 			<div class="discount-section"></div>
+			<div class="form-container-az"></div>
 			<div class="form-container"></div>
+			
 			<div class="serial-batch-container"></div>`
 		);
 
@@ -51,6 +53,7 @@ erpnext.PointOfSale.ItemDetails = class {
 		this.$item_price = this.$component.find(".item-price");
 		this.$item_image = this.$component.find(".item-image");
 		this.$form_container = this.$component.find(".form-container");
+		this.$form_container_az = this.$component.find(".form-container-az");
 		this.$dicount_section = this.$component.find(".discount-section");
 		this.$serial_batch_container = this.$component.find(".serial-batch-container");
 	}
@@ -162,8 +165,43 @@ erpnext.PointOfSale.ItemDetails = class {
 	}
 
 	render_form(item) {
+		console.log("TPO: LOG: ",item)
 		const fields_to_display = this.get_form_fields(item);
-		this.$form_container.html("");
+		this.$form_container.html("");	
+		let az_dimension_data = item.az_dimension;
+		let updateAZQuantity = () =>{
+			let totalLength = 0;
+			if(az_dimension_data.length>0){
+				console.log("YES: ",az_dimension_data.length);
+				az_dimension_data.forEach(row=>{
+					let straigth = row.az_straight ? Number(row.az_straight) : 0;
+					let curve = row.az_curve ?  Number(row.az_curve) : 0;
+					let end = row.az_end ?  Number(row.az_end) : 0;
+					let count = row.az_count ?  Number(row.az_count) : 0;
+					let currentTotal = (straigth+curve+end)/1000 * count;
+					console.log('TPLOG: current ROW ALL',straigth,curve,end,count,currentTotal);
+					totalLength +=currentTotal
+				})
+			}
+			if(totalLength>0){
+				console.log("Afterrr: ",totalLength)
+				this.events.form_updated(this.current_item, 'qty',totalLength);
+			}
+		}
+		let updateAZCustomDimension = (fieldname,row_index,updated_value) => {
+			if(az_dimension_data.length<=row_index) az_dimension_data.push({})
+			az_dimension_data[row_index][fieldname] = updated_value;
+			// console.log('Updated az_dimension_data:', az_dimension_data);
+			this.current_item.az_dimension = az_dimension_data
+			updateAZQuantity()
+			
+		}
+		//AZ Form
+		this.$form_container_az.html("");
+		this.$form_container_az.append(
+			`<div class="az_dimension-control" data-fieldname="az_dimension"></div>`
+		);	
+
 
 		fields_to_display.forEach((fieldname, idx) => {
 			this.$form_container.append(
@@ -173,23 +211,89 @@ erpnext.PointOfSale.ItemDetails = class {
 			const field_meta = this.item_meta.fields.find((df) => df.fieldname === fieldname);
 			fieldname === "discount_percentage" ? (field_meta.label = __("Discount (%)")) : "";
 			const me = this;
-
-			this[`${fieldname}_control`] = frappe.ui.form.make_control({
-				df: {
-					...field_meta,
-					onchange: function () {
-						me.events.form_updated(me.current_item, fieldname, this.value);
-					},
-				},
-				parent: this.$form_container.find(`.${fieldname}-control`),
-				render_input: true,
-			});
-			this[`${fieldname}_control`].set_value(item[fieldname]);
+			if(fieldname != 'az_dimension'){
+				this[`${fieldname}_control`] = frappe.ui.form.make_control({
+					df: {
+						...field_meta,
+						onchange: function () {
+							me.events.form_updated(me.current_item, fieldname, this.value);
+							updateAZQuantity()
+						},
+						},
+					parent: this.$form_container.find(`.${fieldname}-control`),
+					render_input: true,
+				});
+				this[`${fieldname}_control`].set_value(item[fieldname]);
+			}else if (fieldname == 'az_dimension'){
+				this[`az_dimension_control`] = frappe.ui.form.make_control({
+					df: {
+						...field_meta,
+						data: az_dimension_data,
+						in_place_edit: true,
+						get_data: () => {
+							return az_dimension_data;
+						},
+						fields: [
+							{
+								fieldtype: 'Int',
+								fieldname: 'az_straight',
+								label: 'Straight',
+								in_list_view: 1,
+								read_only: 0,
+								onchange: function (event) {
+									let row_index = event.target.closest('div[data-idx]').dataset.idx - 1
+                    				let updated_value = event.target.value;
+									updateAZCustomDimension('az_straight',row_index,updated_value);
+								},
+							},
+							{
+								fieldtype: 'Int',
+								fieldname: 'az_curve',
+								label: 'Curve',
+								in_list_view: 1,
+								read_only: 0 ,
+								onchange: function (event) {
+									let row_index = event.target.closest('div[data-idx]').dataset.idx - 1
+                    				let updated_value = event.target.value;
+									updateAZCustomDimension('az_curve',row_index,updated_value);
+								},
+							},
+							{
+								fieldtype: 'Int',
+								fieldname: 'az_end',
+								label: 'End',
+								in_list_view: 1,
+								read_only: 0 ,
+								onchange: function (event) {
+									let row_index = event.target.closest('div[data-idx]').dataset.idx - 1
+                    				let updated_value = event.target.value;
+									updateAZCustomDimension('az_end',row_index,updated_value);
+								}
+							},
+							{
+								fieldtype: 'Int',
+								fieldname: 'az_count',
+								label: 'Count',
+								in_list_view: 1,
+								read_only: 0 ,
+								onchange: function (event) {
+									let row_index = event.target.closest('div[data-idx]').dataset.idx - 1
+                    				let updated_value = event.target.value;
+									updateAZCustomDimension('az_count',row_index,updated_value);
+								},
+							}],
+						},
+					parent: this.$form_container_az.find(`.az_dimension-control`),
+					render_input: true,
+				});
+			}
+			
 		});
 
 		this.make_auto_serial_selection_btn(item);
 
 		this.bind_custom_control_change_event();
+		
 	}
 
 	get_form_fields(item) {
@@ -202,12 +306,23 @@ erpnext.PointOfSale.ItemDetails = class {
 			"warehouse",
 			"actual_qty",
 			"price_list_rate",
+			
+			
 		];
+		const AZ_CUSTOM_FIELDS = 
+		[
+			"az_dimension"
+		];
+		
 		if (item.has_serial_no) fields.push("serial_no");
 		if (item.has_batch_no) fields.push("batch_no");
+		if (item.item_group == "AZ") fields.unshift(...AZ_CUSTOM_FIELDS);
 		return fields;
 	}
-
+	//TP: custom az function
+	// bind_custom_az_change_event(item){
+		
+	// }
 	make_auto_serial_selection_btn(item) {
 		if (item.has_serial_no || item.has_batch_no) {
 			const label = item.has_serial_no ? __("Select Serial No") : __("Select Batch No");
@@ -322,6 +437,8 @@ erpnext.PointOfSale.ItemDetails = class {
 			}
 		});
 	}
+
+	
 
 	async auto_update_batch_no() {
 		if (this.serial_no_control && this.batch_no_control) {

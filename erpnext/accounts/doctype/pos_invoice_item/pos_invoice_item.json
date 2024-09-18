@@ -37,6 +37,7 @@
   "column_break_19",
   "discount_percentage",
   "discount_amount",
+  "distributed_discount_amount",
   "base_rate_with_margin",
   "section_break1",
   "rate",
@@ -886,6 +887,12 @@
    "fieldtype": "Table",
    "label": "AZ Dimension",
    "options": "POS Invoice AZ Item"
+  },
+  {
+   "fieldname": "distributed_discount_amount",
+   "fieldtype": "Currency",
+   "label": "Distributed Discount Amount",
+   "options": "currency"
   }
  ],
  "istable": 1,

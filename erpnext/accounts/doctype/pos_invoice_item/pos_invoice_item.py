@@ -43,6 +43,7 @@ class POSInvoiceItem(SalesInvoiceItem):
 		description: DF.TextEditor
 		discount_amount: DF.Currency
 		discount_percentage: DF.Percent
+		distributed_discount_amount: DF.Currency
 		dn_detail: DF.Data | None
 		enable_deferred_revenue: DF.Check
 		end: DF.Int
